@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import os
 import pandas as pd
 
@@ -9,11 +9,7 @@ st.set_page_config(
             #page_icon="",
             layout="centered")
 
-# Example local Docker container URL
-# url = 'http://api:8000'
-# Example localhost development URL
-# url = 'http://localhost:8000'
-load_dotenv()
+#load_dotenv()
 url = os.getenv('API_URL')
 
 # App title and description
