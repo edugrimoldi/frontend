@@ -27,6 +27,7 @@ st.markdown("---")
 
 # Create a native Streamlit file upload input
 st.markdown("Choose a video from your computer 👇")
+
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
 # By default, uploaded files are limited to 200MB. You can configure this using the server.maxUploadSize config option
@@ -46,29 +47,23 @@ if uploaded_file is not None:
             res = requests.post(url + "/predict", data=uploaded_file)
 
             if res.status_code == 200:
-                n_shots = st.slider('Select the number of shots', 1, 10, 3)              
-                
                 @st.cache
                 def get_dataframe_data():
-                    return pd.DataFrame(res)
+                    return pd.DataFrame(res,
+                            columns=["Clip_number", "Number_of_findings"]
+                        )
 
                 df = get_dataframe_data()
                 hdf = df.assign(hack='').set_index('hack')
-                   
-                @st.cache
-                def convert_df(df):
-                    return df.to_csv(index=False).encode('utf-8')
-
-                csv = convert_df(hdf)
-
-                st.download_button(
-                    "Download the .csv file",
-                    csv,
-                    "file.csv",
-                    "text/csv",
-                    key='download-csv'
-                )
+                hdf.sort_values(by="Number_of_findings", ascending=False, inplace=True)
+                ### Display the clip returned by the API
+                st.write(hdf.head(10))
                 
+                # Show processed video
+                processed_video = open('myvideo.mp4', 'rb')
+                video_bytes = processed_video.read()
+
+                st.video(video_bytes )
             else:
                 st.markdown("**Oops**, something went wrong 😓 Please try again.")
                 print(res.status_code, res.content)
