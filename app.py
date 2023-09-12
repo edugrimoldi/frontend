@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 #from dotenv import load_dotenv
-import os
+import json
 import pandas as pd
 
 st.set_page_config(
@@ -10,12 +10,12 @@ st.set_page_config(
             layout="centered")
 
 #load_dotenv()
-url = os.getenv('API_URL')
+url = 'http://127.0.0.1:8000'
 
 # App title and description
 st.header('Video Auto Edit')
 st.markdown('''
-            > This app will return the best clips of your video
+            > This app will return the best clips of your gameplay video
             ''')
 
 st.markdown("---")
@@ -25,51 +25,53 @@ st.markdown("Choose a video from your computer 👇")
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
-# By default, uploaded files are limited to 200MB. You can configure this using the server.maxUploadSize config option
-
 uploaded_file = st.file_uploader("Upload a .mp4 file", type="mp4")
+
+
+@st.cache
+def dataframe_to_csv(data):
+    df = pd.DataFrame(data, columns=["start", "end"])
+    return df.to_csv(header=False).encode('utf-8')
 
 if uploaded_file is not None:
     st.video(uploaded_file)
     st.write("Uploaded succesfully")
-    
+
     if st.button('Process the video'):
         with st.spinner("Wait for it..."):
             ### Get bytes from the file buffer
             video_bytes = uploaded_file.getvalue()
-            
-            ### Make request to  API (stream=True to stream response as bytes)
-            res = requests.post(url + "/predict", data=uploaded_file)
+
+            ### Make request to the API
+            res = requests.get(url + "/predict", files={'file': open(video_bytes, 'rb')})
 
             if res.status_code == 200:
-                @st.cache
-                def get_dataframe_data():
-                    return pd.DataFrame(res,
-                            columns=["Clip_number", "Number_of_findings"]
-                        )
-
-                df = get_dataframe_data()
-                hdf = df.assign(hack='').set_index('hack')
-                hdf.sort_values(by="Number_of_findings", ascending=False, inplace=True)
-                ### Display the clip returned by the API
-                st.write(hdf.head(10))
+                # The response return a json str() format
+                res_str = res.json()
                 
-                # Show processed video
-                processed_video = open('myvideo.mp4', 'rb')
-                video_bytes = processed_video.read()
+                # Cast to a json dict() format
+                res_json = json.loads(res_str)
+                
+                # Convert the data into a pd.DataFrame and then load as a .csv file.
+                csv = dataframe_to_csv(res_json)               
 
-                st.video(video_bytes )
+                st.download_button(
+                    label="Download markers as .CSV",
+                    data=csv,
+                    file_name='markers_file.csv',
+                    mime='text/csv')
+                
             else:
                 st.markdown("**Oops**, something went wrong 😓 Please try again.")
                 print(res.status_code, res.content)
-    
+
 st.markdown('''
             > **What's here:**
 
             > * [Streamlit](https://docs.streamlit.io/) on the frontend
             > * [FastAPI](https://fastapi.tiangolo.com/) on the backend
             > * TO CHANGE -> [PIL/pillow](https://pillow.readthedocs.io/en/stable/) and [opencv-python](https://github.com/opencv/opencv-python) for working with images
-            
-            > Built with 
+
+            > Built with
             > * **Visit** our [repo](http://github.com/edugrimoldi/frontend) in Github
             ''')
