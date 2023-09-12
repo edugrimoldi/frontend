@@ -3,6 +3,8 @@ import requests
 #from dotenv import load_dotenv
 import json
 import pandas as pd
+import shutil
+import base64
 
 st.set_page_config(
             page_title="Video Auto Edit",
@@ -34,36 +36,34 @@ def dataframe_to_csv(data):
     return df.to_csv(header=False).encode('utf-8')
 
 if uploaded_file is not None:
-    st.video(uploaded_file)
+    #st.video(uploaded_file)
     st.write("Uploaded succesfully")
 
     if st.button('Process the video'):
         with st.spinner("Wait for it..."):
             ### Get bytes from the file buffer
-            video_bytes = uploaded_file.getvalue()
+            video_bytes = uploaded_file.read()
+
+            files = {'video': video_bytes}
 
             ### Make request to the API
-            res = requests.get(url + "/predict", files={'file': open(video_bytes, 'rb')})
+            with requests.post(url + "/predict", files=files, stream=True) as res:
 
-            if res.status_code == 200:
-                # The response return a json str() format
-                res_str = res.json()
-                
-                # Cast to a json dict() format
-                res_json = json.loads(res_str)
-                
-                # Convert the data into a pd.DataFrame and then load as a .csv file.
-                csv = dataframe_to_csv(res_json)               
+                if res.status_code == 200:
+                    locals_filename = "markers_file.csv"
 
-                st.download_button(
-                    label="Download markers as .CSV",
-                    data=csv,
-                    file_name='markers_file.csv',
-                    mime='text/csv')
-                
-            else:
-                st.markdown("**Oops**, something went wrong 😓 Please try again.")
-                print(res.status_code, res.content)
+                    with open(locals_filename, 'wb') as f:
+                        shutil.copyfileobj(res.raw, f)
+
+                    st.download_button(
+                        label="Download markers as .CSV",
+                        data=locals_filename,
+                        file_name='markers_file.csv',
+                        mime='text/csv')
+
+                else:
+                    st.markdown("**Oops**, something went wrong 😓 Please try again.")
+                    print(res.status_code, res.content)
 
 st.markdown('''
             > **What's here:**
