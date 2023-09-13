@@ -12,7 +12,7 @@ st.set_page_config(
             layout="centered")
 
 #load_dotenv()
-url = 'http://127.0.0.1:8000'
+url = 'https://auto-edit-vkmckhunoq-uc.a.run.app'
 
 # App title and description
 st.header('Video Auto Edit')
@@ -28,7 +28,6 @@ st.markdown("Choose a video from your computer 👇")
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
 uploaded_file = st.file_uploader("Upload a .mp4 file", type="mp4")
-
 
 if uploaded_file is not None:
     #st.video(uploaded_file)
@@ -57,7 +56,6 @@ if uploaded_file is not None:
                     "text/csv",
                     key='download-csv'
                     )
-
 
                 else:
                     st.markdown("**Oops**, something went wrong 😓 Please try again.")
