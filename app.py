@@ -30,11 +30,6 @@ st.set_option('deprecation.showfileUploaderEncoding', False)
 uploaded_file = st.file_uploader("Upload a .mp4 file", type="mp4")
 
 
-@st.cache
-def dataframe_to_csv(data):
-    df = pd.DataFrame(data, columns=["start", "end"])
-    return df.to_csv(header=False).encode('utf-8')
-
 if uploaded_file is not None:
     #st.video(uploaded_file)
     st.write("Uploaded succesfully")
@@ -44,22 +39,25 @@ if uploaded_file is not None:
             ### Get bytes from the file buffer
             video_bytes = uploaded_file.read()
 
-            files = {'video': video_bytes}
+            files = {'file': video_bytes}
 
             ### Make request to the API
             with requests.post(url + "/predict", files=files, stream=True) as res:
 
                 if res.status_code == 200:
-                    locals_filename = "markers_file.csv"
-
-                    with open(locals_filename, 'wb') as f:
-                        shutil.copyfileobj(res.raw, f)
+                    response = res.json()
+                    test_dict = json.loads(response)
+                    df = pd.DataFrame.from_dict(test_dict)
+                    csv = df.to_csv(header=False)
 
                     st.download_button(
-                        label="Download markers as .CSV",
-                        data=locals_filename,
-                        file_name='markers_file.csv',
-                        mime='text/csv')
+                    "Press to Download",
+                    csv,
+                    "file.csv",
+                    "text/csv",
+                    key='download-csv'
+                    )
+
 
                 else:
                     st.markdown("**Oops**, something went wrong 😓 Please try again.")
