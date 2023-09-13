@@ -12,7 +12,7 @@ st.set_page_config(
             layout="centered")
 
 #load_dotenv()
-url = 'http://127.0.0.1:8000'
+url = 'https://auto-edit-vkmckhunoq-uc.a.run.app'
 
 # App title and description
 st.header('Video Auto Edit')
