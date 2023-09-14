@@ -16,7 +16,6 @@ CSS = """
 * {
     font-family: 'Chakra Petch', monospace, helvetica;
     font-weight: bold;
-    color: white;
 }
 
 h1 {
