@@ -7,7 +7,7 @@ import shutil
 import base64
 
 st.set_page_config(
-            page_title="Video Auto Edit",
+            page_title="Gameplay Video Auto Edit",
             #page_icon="",
             layout="centered")
 
@@ -19,8 +19,10 @@ CSS = """
 }
 
 h1 {
-    color: black;
+    color: white;
+    text-shadow: 4px 2px 6px #9aa19b;
 }
+
 .stApp {
     background-color: #021f06;
 }
@@ -83,7 +85,10 @@ if uploaded_file is not None:
                     st.markdown("**Oops**, something went wrong 😓 Please try again.")
                     print(res.status_code, res.content)
 
+
+st.markdown("---")
 st.markdown('''
-            > **What's here:**
-            > * **Visit** our [repo](http://github.com/edugrimoldi/frontend) in Github
+
+
+            > * **Visit** our [repo](http://github.com/edugrimoldi/auto-edit) in Github
             ''')
