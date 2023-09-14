@@ -11,6 +11,24 @@ st.set_page_config(
             #page_icon="",
             layout="centered")
 
+CSS = """
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch&display=swap');
+* {
+    font-family: 'Chakra Petch', monospace, helvetica;
+    font-weight: bold;
+}
+
+h1 {
+    color: black;
+}
+.stApp {
+    background-color: #021f06;
+}
+"""
+
+if st.checkbox('Inject CSS'):
+    st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
+
 #load_dotenv()
 url = 'https://auto-edit-vkmckhunoq-uc.a.run.app'
 
@@ -44,13 +62,18 @@ if uploaded_file is not None:
             with requests.post(url + "/predict", files=files, stream=True) as res:
 
                 if res.status_code == 200:
+                    st.markdown("File processed succesfully! ✅")
                     response = res.json()
                     test_dict = json.loads(response)
                     df = pd.DataFrame.from_dict(test_dict)
                     csv = df.to_csv(header=False)
+                    
+                    st.markdown("---")
+
+                    st.write("Your csv is ready!")
 
                     st.download_button(
-                    "Press to Download",
+                    "Download",
                     csv,
                     "file.csv",
                     "text/csv",
@@ -63,11 +86,5 @@ if uploaded_file is not None:
 
 st.markdown('''
             > **What's here:**
-
-            > * [Streamlit](https://docs.streamlit.io/) on the frontend
-            > * [FastAPI](https://fastapi.tiangolo.com/) on the backend
-            > * TO CHANGE -> [PIL/pillow](https://pillow.readthedocs.io/en/stable/) and [opencv-python](https://github.com/opencv/opencv-python) for working with images
-
-            > Built with
             > * **Visit** our [repo](http://github.com/edugrimoldi/frontend) in Github
             ''')
