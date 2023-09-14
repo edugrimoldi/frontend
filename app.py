@@ -19,12 +19,7 @@ CSS = """
 }
 
 h1 {
-    color: white;
     text-shadow: 4px 2px 6px #9aa19b;
-}
-
-.stApp {
-    background-color: #021f06;
 }
 """
 
