@@ -22,11 +22,6 @@ CSS = """
 h1 {
     text-shadow: 4px 2px 6px #9aa19b;
 }
-
-.stApp {
-    background-color: #1f2120;
-}
-
 """
 
 st.write(f'<style>{CSS}</style>', unsafe_allow_html=True)
