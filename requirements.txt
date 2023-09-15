@@ -3,3 +3,5 @@ requests
 dotenv
 pandas
 numpy
+setuptools
+wheel
