@@ -1,6 +1,5 @@
 streamlit>=1.9.2
 requests
-dotenv
 pandas
 numpy
 wheel
